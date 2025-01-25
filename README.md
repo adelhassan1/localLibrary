@@ -1,6 +1,6 @@
 # express-locallibrary-tutorial
 
-Tutorial "Local Library" website written in in Node/Express.
+Tutorial "Local Library" website written in Node/Express.
 
 ---
 
