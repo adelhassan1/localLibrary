@@ -5,10 +5,16 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
 require('dotenv').config();
+const cors = require('cors');
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const catalogRouter = require('./routes/catalog');
+const bookRouter = require('./routes/api/v1/book');
+const authorRouter = require('./routes/api/v1/author');
+const bookinstanceRouter = require('./routes/api/v1/bookinstance');
+const genreRouter = require('./routes/api/v1/genre');
+
 
 const app = express();
 
@@ -24,6 +30,7 @@ async function main() {
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+app.use(cors({ origin: 'http://localhost:3000' }))
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -33,6 +40,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/catalog', catalogRouter);
+app.use('/api/v1', bookRouter);
+app.use('/api/v1', authorRouter);
+app.use('/api/v1', bookinstanceRouter);
+app.use('/api/v1', genreRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -49,5 +60,6 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
 
 module.exports = app;

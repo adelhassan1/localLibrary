@@ -34,7 +34,7 @@ exports.index = asyncHandler(async (req, res, next) => {
 exports.book_list = asyncHandler(async (req, res, next) => {
 	const allBooks = await Book.find({}, "title author").sort({ title: 1 }).populate("author").exec();
 
-	res.render("book_list", { title: "Book List", book_list: allBooks});
+	res.render("book_list", { title: "Book List", book_list: allBooks });
 });
 
 // Display detail page for a specific book.
@@ -58,7 +58,7 @@ exports.book_detail = asyncHandler(async (req, res, next) => {
 });
 
 // Display book create form on GET.
-exports.book_create_get = asyncHandler(async(req, res, next) => {
+exports.book_create_get = asyncHandler(async (req, res, next) => {
 	const [allAuthors, allGenres] = await Promise.all([
 		Author.find().sort({ family_name: 1 }).exec(),
 		Genre.find().sort({ name: 1 }).exec()
@@ -75,7 +75,7 @@ exports.book_create_get = asyncHandler(async(req, res, next) => {
 exports.book_create_post = [
 	(req, res, next) => {
 		if (!Array.isArray(req.body.genre)) {
-			req.body.genre = 
+			req.body.genre =
 				typeof req.body.genre === "undefined" ? [] : [req.body.genre];
 		}
 		next();
@@ -98,8 +98,8 @@ exports.book_create_post = [
 			genre: req.body.genre,
 		});
 
-		
-		if(!errors.isEmpty()) {
+
+		if (!errors.isEmpty()) {
 			const [allAuthors, allGenres] = await Promise.all([
 				Author.find().sort({ family_name: 1 }).exec(),
 				Genre.find().sort({ name: 1 }).exec(),
@@ -222,7 +222,7 @@ exports.book_update_post = [
 				Genre.find().sort({ name: 1 }).exec(),
 			]);
 
-			for (const genre of allGenres){
+			for (const genre of allGenres) {
 				if (book.genre.indexOf(genre._id) > -1) {
 					genre.checked = "true";
 				}
