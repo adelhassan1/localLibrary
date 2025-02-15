@@ -33,7 +33,17 @@ exports.author_detail = asyncHandler(async (req, res, next) => {
 
 //Display Author create form on get.
 exports.author_create_get = asyncHandler(async (req, res, next) => {
-	res.json({message: "Not implemented"});
+	res.json({
+		title: "Create Author",
+		action: "/api/v1/author/create",
+		method: "POST",
+		fields: [
+			{ name: "firstname", type: "text", label: "First Name", required: true },
+			{ name: "lastname", type: "text", label: "family Name", required: true },
+			{ name: "date_of_birth", type: "text", label: "Date of Birth" },
+			{ name: "date_of_death", type: "text", label: "Date of Death" },
+		],
+	});
 });
 
 //Display Author create form on post.
