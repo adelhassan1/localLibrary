@@ -1,7 +1,7 @@
 const Author = require('../../models/author');
 const Book = require('../../models/book');
 const asyncHandler = require('express-async-handler');
-const { body, validationResult } = require('express-validator');
+const { checkSchema, validationResult } = require('express-validator');
 
 //Display list of all authors.
 exports.author_list = asyncHandler(async (req, res, next) => {
@@ -47,9 +47,45 @@ exports.author_create_get = asyncHandler(async (req, res, next) => {
 });
 
 //Display Author create form on post.
-exports.author_create_post = asyncHandler(async (req, res, next) => {
-	res.json({message: "Not implemented"});
-});
+exports.author_create_post = [
+	checkSchema({
+		first_name: {
+			trim: true,
+			isLength: {
+				options: { min: 3 },
+				errorMessage: "FIRST name must be more than 3 characters.",
+			},
+			escape: true,
+			isAlphanumeric: {
+				errorMessage: "First name must be alphanumeric characters.",
+			},
+		},
+		family_name: {
+			trim: true,
+			isLength: {
+				options: { min: 3 },
+				errorMessage: "Last name must be more than 3 characters.",
+			},
+			escape: true,
+			isAlphanumeric: {
+				errorMessage: "Last name must be alphanumeric characters.",
+			},
+		},
+		date_of_birth: {
+			errorMessage: "Invalid date of birth.",
+			optional: { options: { values: 'falsy' } },
+			isBefore: true,
+			isISO8601: true,
+			toDate: true,
+		},
+		date_of_death: {
+			errorMessage: "Invalid date of death.",
+			optional: { options: { values: 'falsy' } },
+			isISO8601: true,
+			toDate: true,
+		},
+	}),
+];
 
 //Display Author delete form on get.
 exports.author_delete_get = asyncHandler(async (req, res, next) => {

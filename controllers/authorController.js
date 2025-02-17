@@ -1,7 +1,7 @@
 const Author = require('../models/author');
 const Book = require('../models/book');
 const asyncHandler = require('express-async-handler');
-const { body, validationResult } = require('express-validator');
+const { body, validationResult, checkSchema } = require('express-validator');
 
 // Display list of all Authors.
 exports.author_list = asyncHandler(async (req, res, next) => {
@@ -40,22 +40,59 @@ exports.author_create_get = (req, res, next) => {
 
 // Handle Author create on POST.
 exports.author_create_post = [
-	body("first_name").trim().isLength({ min: 1 }).escape()
-		.withMessage("First name must be specified.")
-		.isAlphanumeric()
-		.withMessage("First name has non-alphanumeric characters."),
-	body("family_name").trim().isLength({ min: 1 }).escape()
-		.withMessage("Last name must be specified.")
-		.isAlphanumeric()
-		.withMessage("Last name has non-alpanumeric characters."),
-	body("date_of_birth", "Invalid date of birth")
-		.optional({ values: "falsy" })
-		.isISO8601()
-		.toDate(),
-	body("date_of_death", "Invalid date of death")
-		.optional({ values: "falsy" })
-		.isISO8601()
-		.toDate(),
+	checkSchema({
+		first_name: {
+			trim: true,
+			isLength: {
+				options: { min: 3 },
+				errorMessage: "FIRST name must be more than 3 characters.",
+			},
+			escape: true,
+			isAlphanumeric: {
+				errorMessage: "First name must be alphanumeric characters.",
+			},
+		},
+		family_name: {
+			trim: true,
+			isLength: {
+				options: { min: 3 },
+				errorMessage: "Last name must be more than 3 characters.",
+			},
+			escape: true,
+			isAlphanumeric: {
+				errorMessage: "Last name must be alphanumeric characters.",
+			},
+		},
+		date_of_birth: {
+			errorMessage: "Invalid date of birth.",
+			optional: { options: { values: 'falsy' } },
+			isBefore: true,
+			isISO8601: true,
+			toDate: true,
+		},
+		date_of_death: {
+			errorMessage: "Invalid date of death.",
+			optional: { options: { values: 'falsy' } },
+			isISO8601: true,
+			toDate: true,
+		},
+	}),
+	// body("first_name").trim().isLength({ min: 1 }).escape()
+	// 	.withMessage("First name must be specified.")
+	// 	.isAlphanumeric()
+	// 	.withMessage("First name has non-alphanumeric characters."),
+	// body("family_name").trim().isLength({ min: 1 }).escape()
+	// 	.withMessage("Last name must be specified.")
+	// 	.isAlphanumeric()
+	// 	.withMessage("Last name has non-alpanumeric characters."),
+	// body("date_of_birth", "Invalid date of birth")
+	// 	.optional({ values: "falsy" })
+	// 	.isISO8601()
+	// 	.toDate(),
+	// body("date_of_death", "Invalid date of death")
+	// 	.optional({ values: "falsy" })
+	// 	.isISO8601()
+	// 	.toDate(),
 
 	asyncHandler(async (req, res, next) => {
 		const errors = validationResult(req);
