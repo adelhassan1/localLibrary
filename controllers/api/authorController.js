@@ -79,6 +79,7 @@ exports.author_create = [
 			last_name: req.body.last_name,
 			date_of_birth: req.body.date_of_birth,
 			date_of_death: req.body.date_of_death,
+			created_at: Date.now(),
 		});
 
 		if (!errors.isEmpty) {
@@ -155,12 +156,14 @@ exports.author_update = [
 			last_name: req.body.last_name,
 			date_of_birth: req.body.date_of_birth,
 			date_of_death: req.body.date_of_death,
+			_id: req.params.id,
 		});
 
 		if (!errors.isEmpty) {
 			res.json({ errors: errors.array() });
 		} else {
-			await Author.findByIdAndUpdate(req.params.id, )
+			await Author.findByIdAndUpdate(req.params.id, author, {});
+			res.status(200).json({ message: "Updated Successfully." });
 		}
 	})
 ];

@@ -52,7 +52,7 @@ exports.author_create_post = [
 				errorMessage: "First name must be alphanumeric characters.",
 			},
 		},
-		last_name: {
+		family_name: {
 			trim: true,
 			isLength: {
 				options: { min: 3 },
