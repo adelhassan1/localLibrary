@@ -8,6 +8,7 @@ const BookSchema = new Schema({
 	summary: {type: String, required: true},
 	copies: {type: Number, required: true},
 	genre: [{type: Schema.Types.ObjectId, ref: "Genre"}],
+	created_at: { type: Date },
 });
 
 BookSchema.virtual('url').get(function () {
