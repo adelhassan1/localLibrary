@@ -3,18 +3,15 @@ const router = express.Router();
 
 const book_controller = require('../../../controllers/api/bookController');
 
-router.get('/', book_controller.index);
+router.get('/', book_controller.book_list);
 
-router.get('/book/create', book_controller.book_create_get);
-router.post('/book/create', book_controller.book_create_post);
+router.get('/:id', book_controller.book_detail);
 
-router.get('/book/:id/delete', book_controller.book_delete_get);
-router.post('/book/:id/delete', book_controller.book_delete_post);
+router.post('/create', book_controller.book_create);
 
-router.get('/book/:id/update', book_controller.book_update_get);
-router.post('/book/:id/update', book_controller.book_update_post);
+router.delete('/:id', book_controller.book_delete);
 
-router.get('/books', book_controller.book_list);
-router.get('/book/:id', book_controller.book_detail);
+router.patch('/:id', book_controller.book_update);
+
 
 module.exports = router;
