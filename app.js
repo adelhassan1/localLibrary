@@ -41,7 +41,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/catalog', catalogRouter);
 app.use('/api/v1', bookRouter);
-app.use('/api/v1', authorRouter);
+app.use('/api/v1/authors', authorRouter);
 app.use('/api/v1', bookinstanceRouter);
 app.use('/api/v1', genreRouter);
 

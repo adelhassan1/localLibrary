@@ -5,7 +5,7 @@ const { body, validationResult, checkSchema } = require('express-validator');
 
 // Display list of all Authors.
 exports.author_list = asyncHandler(async (req, res, next) => {
-	const allAuthors = await Author.find().sort({ family_name: 1 }).exec();
+	const allAuthors = await Author.find().sort({ last_name: 1 }).exec();
 
 	res.render("author_list", {
 		title: "Author List",
@@ -45,14 +45,14 @@ exports.author_create_post = [
 			trim: true,
 			isLength: {
 				options: { min: 3 },
-				errorMessage: "FIRST name must be more than 3 characters.",
+				errorMessage: "First name must be more than 3 characters.",
 			},
 			escape: true,
 			isAlphanumeric: {
 				errorMessage: "First name must be alphanumeric characters.",
 			},
 		},
-		family_name: {
+		last_name: {
 			trim: true,
 			isLength: {
 				options: { min: 3 },
@@ -81,7 +81,7 @@ exports.author_create_post = [
 	// 	.withMessage("First name must be specified.")
 	// 	.isAlphanumeric()
 	// 	.withMessage("First name has non-alphanumeric characters."),
-	// body("family_name").trim().isLength({ min: 1 }).escape()
+	// body("last_name").trim().isLength({ min: 1 }).escape()
 	// 	.withMessage("Last name must be specified.")
 	// 	.isAlphanumeric()
 	// 	.withMessage("Last name has non-alpanumeric characters."),
@@ -99,7 +99,7 @@ exports.author_create_post = [
 
 		const author = new Author({
 			first_name: req.body.first_name,
-			family_name: req.body.family_name,
+			last_name: req.body.last_name,
 			date_of_birth: req.body.date_of_birth,
 			date_of_death: req.body.date_of_death,
 		});
@@ -163,7 +163,7 @@ exports.author_update_get = asyncHandler(async (req, res, next) => {
 
 // Handle Author update on POST.
 exports.author_update_post = [
-	body("family_name").trim().isLength({ min: 1 }).escape()
+	body("last_name").trim().isLength({ min: 1 }).escape()
 		.withMessage("Family name must not be empty.")
 		.isAlphanumeric()
 		.withMessage("Family name has non-alphanumeric characters."),
@@ -184,7 +184,7 @@ exports.author_update_post = [
 		const errors = validationResult(req);
 
 		const author = new Author({
-			family_name: req.body.family_name,
+			last_name: req.body.last_name,
 			first_name: req.body.first_name,
 			date_of_birth: req.body.date_of_birth,
 			date_of_death: req.body.date_of_death,
