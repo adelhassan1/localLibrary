@@ -115,7 +115,7 @@ exports.genre_update_post = [
 
 	asyncHandler(async (req, res, next) => {
 		const errors = validationResult(req);
-		const genre = await new Genre({
+		const genre = new Genre({
 			name: req.body.name,
 			_id: req.params.id,
 		});

@@ -43,7 +43,7 @@ app.use('/catalog', catalogRouter);
 app.use('/api/v1', homeRouter);
 app.use('/api/v1/authors', authorRouter);
 app.use('/api/v1/books', bookRouter);
-app.use('/api/v1', genreRouter);
+app.use('/api/v1/genres', genreRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

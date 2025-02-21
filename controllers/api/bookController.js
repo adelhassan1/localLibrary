@@ -78,7 +78,7 @@ exports.book_create = [
 			genre: req.body.gerne,
 		});
 
-		if (!errors.isEmpty) {
+		if (!errors.isEmpty()) {
 			res.json({ errors: errors.array() });
 		} else {
 			await book.save();
