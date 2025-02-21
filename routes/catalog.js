@@ -3,7 +3,6 @@ const router = express.Router();
 
 const book_controller = require('../controllers/bookController');
 const author_controller = require('../controllers/authorController');
-const book_instance_controller = require('../controllers/bookinstanceController');
 const genre_controller = require('../controllers/genreController');
 
 
@@ -52,21 +51,6 @@ router.post("/genre/:id/update", genre_controller.genre_update_post);
 
 router.get("/genre/:id", genre_controller.genre_detail);
 router.get("/genres", genre_controller.genre_list);
-
-
-/// BOOKINSTANCE ROUTES ///
-
-router.get("/bookinstance/create", book_instance_controller.bookinstance_create_get);
-router.post("/bookinstance/create", book_instance_controller.bookinstance_create_post);
-
-router.get("/bookinstance/:id/delete", book_instance_controller.bookinstance_delete_get);
-router.post("/bookinstance/:id/delete", book_instance_controller.bookinstance_delete_post);
-
-router.get("/bookinstance/:id/update", book_instance_controller.bookinstance_update_get);
-router.post("/bookinstance/:id/update", book_instance_controller.bookinstance_update_post);
-
-router.get("/bookinstance/:id", book_instance_controller.bookinstance_detail);
-router.get("/bookinstances", book_instance_controller.bookinstance_list);
 
 
 module.exports = router;

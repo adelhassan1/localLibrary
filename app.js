@@ -13,7 +13,6 @@ const catalogRouter = require('./routes/catalog');
 const homeRouter = require('./routes/api/v1/index');
 const bookRouter = require('./routes/api/v1/book');
 const authorRouter = require('./routes/api/v1/author');
-const bookinstanceRouter = require('./routes/api/v1/bookinstance');
 const genreRouter = require('./routes/api/v1/genre');
 
 
@@ -43,7 +42,7 @@ app.use('/users', usersRouter);
 app.use('/catalog', catalogRouter);
 app.use('/api/v1', homeRouter);
 app.use('/api/v1/authors', authorRouter);
-app.use('/api/v1', bookinstanceRouter);
+app.use('/api/v1/books', bookRouter);
 app.use('/api/v1', genreRouter);
 
 // catch 404 and forward to error handler

@@ -1,8 +1,7 @@
 const Book = require("../models/book");
 const Author = require("../models/author");
-const BookInstance = require("../models/bookinstance");
 const Genre = require("../models/genre");
-const { body, validationResult, ExpressValidator } = require("express-validator");
+const { body, validationResult } = require("express-validator");
 const asyncHandler = require("express-async-handler");
 
 exports.index = asyncHandler(async (req, res, next) => {
