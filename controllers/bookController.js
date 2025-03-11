@@ -1,207 +1,71 @@
-const Book = require("../models/book");
-const Author = require("../models/author");
-const Genre = require("../models/genre");
-const { body, validationResult } = require("express-validator");
-const asyncHandler = require("express-async-handler");
+const Book = require('../models/book');
+const asyncHandler = require('express-async-handler');
+const { checkSchema, validationResult } = require('express-validator');
 
-exports.index = asyncHandler(async (req, res, next) => {
-	const [
-		numBooks,
-		numBookInstances,
-		numAvailableBookInstances,
-		numAuthors,
-		numGenres
-	] = await Promise.all([
-		Book.countDocuments({}).exec(),
-		BookInstance.countDocuments({}).exec(),
-		BookInstance.countDocuments({ status: "Available" }).exec(),
-		Author.countDocuments({}).exec(),
-		Genre.countDocuments({}).exec(),
-	]);
-
-	res.render("index", {
-		title: "Local Library Home",
-		book_count: numBooks,
-		book_instance_count: numBookInstances,
-		book_instance_available_count: numAvailableBookInstances,
-		author_count: numAuthors,
-		genre_count: numGenres,
-	});
-});
-
-// Display list of all books.
+//Display list of all books.
 exports.book_list = asyncHandler(async (req, res, next) => {
 	const allBooks = await Book.find({}, "title author").sort({ title: 1 }).populate("author").exec();
-
-	res.render("book_list", { title: "Book List", book_list: allBooks });
+	res.json({
+		Books: allBooks,
+	});
 });
 
-// Display detail page for a specific book.
+//Display detail page of a specific book.
 exports.book_detail = asyncHandler(async (req, res, next) => {
-	const [book, bookInstances] = await Promise.all([
-		Book.findById(req.params.id).populate("author").populate("genre").exec(),
-		BookInstance.find({ book: req.params.id }).exec(),
-	]);
+	const book = await Book.findById(req.params.id).populate('author').populate('genre').exec();
 
 	if (book === null) {
-		const err = new Error("book not found");
-		err.status = 404;
-		return next(err);
+		const error = new Error("book not found.");
+		error.status = 404;
+		return next(error);
 	};
 
-	res.render("book_detail", {
-		title: "book.title",
+	res.json({
 		book: book,
-		book_instances: bookInstances,
 	});
 });
 
-// Display book create form on GET.
-exports.book_create_get = asyncHandler(async (req, res, next) => {
-	const [allAuthors, allGenres] = await Promise.all([
-		Author.find().sort({ family_name: 1 }).exec(),
-		Genre.find().sort({ name: 1 }).exec()
-	]);
 
-	res.render("book_form", {
-		title: "Create Book",
-		authors: allAuthors,
-		genres: allGenres,
-	});
-});
-
-// Handle book create on POST.
-exports.book_create_post = [
+//Display book create form on post.
+exports.book_create = [
 	(req, res, next) => {
 		if (!Array.isArray(req.body.genre)) {
 			req.body.genre =
-				typeof req.body.genre === "undefined" ? [] : [req.body.genre];
+				typeof req.body.genre === 'undefined' ? [] : [req.body.genre];
 		}
 		next();
 	},
 
-	body("title", "Title must not be empty.").trim().isLength({ min: 1 }).escape(),
-	body("author", "Author must not be empty.").trim().isLength({ min: 1 }).escape(),
-	body("summary", "Summary must not be empty.").trim().isLength({ min: 1 }).escape(),
-	body("isbn", "ISBN must not be empty.").trim().isLength({ min: 1 }).escape(),
-	body("genre.*").escape(),
-
-	asyncHandler(async (req, res, next) => {
-		const errors = validationResult(req);
-
-		const book = new Book({
-			title: req.body.title,
-			author: req.body.author,
-			summary: req.body.summary,
-			isbn: req.body.isbn,
-			genre: req.body.genre,
-		});
-
-
-		if (!errors.isEmpty()) {
-			const [allAuthors, allGenres] = await Promise.all([
-				Author.find().sort({ family_name: 1 }).exec(),
-				Genre.find().sort({ name: 1 }).exec(),
-			]);
-
-			for (const genre of allGenres) {
-				if (book.genre.includes(genre._id)) {
-					genre.checked = "true";
-				}
-			}
-
-			res.render("book_form", {
-				title: "Create Book",
-				authors: allAuthors,
-				genres: allGenres,
-				book: book,
-				errors: errors.array(),
-			});
-		} else {
-			await book.save();
-			res.redirect(book.url);
+	checkSchema({
+		title: {
+			errorMessage: "Title must not be empty.",
+			trim: true,
+			isLength: { options: { min: 3 } },
+			escape: true,
+		},
+		author: {
+			errorMessage: "Author must not be empty.",
+			trim: true,
+			isLength: { options: { min: 3 } },
+			escape: true,
+		},
+		summary: {
+			errorMessage: "Summary must not be empty.",
+			trim: true,
+			isLength: { options: { min: 3 } },
+			escape: true,
+		},
+		copies: {
+			errorMessage: "Copies must not be empty.",
+			trim: true,
+			isNumeric: { errorMessage: "Copies must be a valid number." },
+			isLength: { options: { min: 1 } },
+			escape: true,
+		},
+		'genre.*': {
+			escape: true,
 		}
 	}),
-];
-
-// Display book delete form on GET.
-exports.book_delete_get = asyncHandler(async (req, res, next) => {
-	const [book, allBookInstances] = await Promise.all([
-		Book.findById(req.params.id).exec(),
-		BookInstance.find({ Book: req.params.id }, "status imprint").exec(),
-	]);
-
-	if (book === null) {
-		res.redirect("/catalog/books");
-	}
-
-	res.render("book_delete", {
-		title: "Delete Book",
-		book: book,
-		book_instances: allBookInstances,
-	});
-});
-
-// Handle book delete on POST.
-exports.book_delete_post = asyncHandler(async (req, res, next) => {
-	const [book, allBookInstances] = await Promise.all([
-		Book.findById(req.params.id).populate('author').populate('genre').exec(),
-		BookInstance.find({ book: req.params.id }).exec(),
-	]);
-
-	if (allBookInstances.length > 0) {
-		res.render("book_delete", {
-			title: "Delete Book",
-			book: book,
-			book_instances: allBookInstances,
-		});
-		return;
-	} else {
-		await Book.findByIdAndDelete(req.body.id);
-		res.redirect("/catalog/books");
-	}
-});
-
-// Display book update form on GET.
-exports.book_update_get = asyncHandler(async (req, res, next) => {
-	const [book, allAuthors, allGenres] = await Promise.all([
-		Book.findById(req.params.id).populate('author').exec(),
-		Author.find().sort({ family: 1 }).exec(),
-		Genre.find().sort({ name: 1 }).exec(),
-	]);
-
-	if (book === null) {
-		const err = new Error("Book not found");
-		err.status = 404;
-		return next(err);
-	}
-
-	allGenres.forEach((genre) => {
-		if (book.genre.includes(genre._id)) genre.checked = "true";
-	});
-
-	res.render("book_form", {
-		title: "Update Book",
-		authors: allAuthors,
-		genres: allGenres,
-		book: book,
-	});
-});
-
-// Handle book update on POST.
-exports.book_update_post = [
-	(req, res, next) => {
-		if (!Array.isArray(req.body.genre)) {
-			req.body.genre = typeof req.body.genre === "undefined" ? [] : [req.body.genre];
-		}
-		next();
-	},
-
-	body("title", "Title must not be empty.").trim().isLength({ min: 1 }).escape(),
-	body("author", "Author must not be empty.").trim().isLength({ min: 1 }).escape(),
-	body("summary", "Summary must not be empty.").trim().isLength({ min: 1 }).escape(),
-	body("isbn", "ISBN must not be empty.").trim().isLength({ min: 1 }).escape(),
-	body("genre.*").escape(),
 
 	asyncHandler(async (req, res, next) => {
 		const errors = validationResult(req);
@@ -210,33 +74,91 @@ exports.book_update_post = [
 			title: req.body.title,
 			author: req.body.author,
 			summary: req.body.summary,
-			isbn: req.body.isbn,
-			genre: typeof req.body.genre === "undefined" ? [] : req.body.genre,
-			_id: req.params.id,
+			copies: req.body.copies,
+			genre: req.body.gerne,
+		});
+
+		if (!errors.isEmpty()) {
+			res.json({ errors: errors.array() });
+		} else {
+			await book.save();
+			res.status(201).json({ message: "Book created.", date: req.body });
+		}
+	})
+]
+
+//Display book delete form on post.
+exports.book_delete = asyncHandler(async (req, res, next) => {
+	const book = await Book.findById(req.params.id).exec();
+
+	if (book === null) {
+		const error = new Error("Book not found.");
+		error.status = 404;
+		return next(error);
+	} else {
+		await Book.findByIdAndDelete(req.params.id);
+		res.status(200).json({ message: "Book deleted." });
+	}
+});
+
+//Display book update from on post.
+exports.book_update = [
+	(req, res, next) => {
+		if (!Array.isArray(req.body.genre)) {
+			req.body.genre =
+				typeof req.body.genre === 'undefined' ? [] : [req.body.genre];
+		}
+		next();
+	},
+
+	checkSchema({
+		title: {
+			errorMessage: "Title must not be empty.",
+			trim: true,
+			isLength: { options: { min: 3 } },
+			escape: true,
+		},
+		author: {
+			errorMessage: "Author must not be empty.",
+			trim: true,
+			isLength: { options: { min: 3 } },
+			escape: true,
+		},
+		summary: {
+			errorMessage: "Summary must not be empty.",
+			trim: true,
+			isLength: { options: { min: 3 } },
+			escape: true,
+		},
+		copies: {
+			errorMessage: "Copies must not be empty.",
+			trim: true,
+			isNumeric: { errorMessage: "Copies must be a valid number." },
+			isLength: { options: { min: 1 } },
+			escape: true,
+		},
+		'genre.*': {
+			escape: true,
+		}
+	}),
+
+	asyncHandler(async (req, res, next) => {
+		const errors = validationResult(req);
+
+		const book = new Book({
+			title: req.body.title,
+			author: req.body.author,
+			summary: req.body.summary,
+			copies: req.body.copies,
+			genre: req.body.gerne,
+			_id: req.params.id
 		});
 
 		if (!errors.isEmpty) {
-			const [allAuthors, allGenres] = await Promise.all([
-				Author.find().sort({ family: 1 }).exec(),
-				Genre.find().sort({ name: 1 }).exec(),
-			]);
-
-			for (const genre of allGenres) {
-				if (book.genre.indexOf(genre._id) > -1) {
-					genre.checked = "true";
-				}
-			}
-			res.render("book_form", {
-				title: "Update Book",
-				authors: allAuthors,
-				genres: allGenres,
-				book: book,
-				errors: errors.array(),
-			});
-			return;
+			res.json({ errors: errors.array() });
 		} else {
-			const updatedBook = await Book.findByIdAndUpdate(req.params.id, book, {});
-			res.redirect(updatedBook.url);
+			await Book.findByIdAndUpdate(req.params.id, book, {}).populate("author").populate("genre");
+			res.status(200).json({ message: "Book updated.", date: req.body });
 		}
-	}),
-];
+	})
+]

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const author_controller = require('../../../controllers/api/authorController');
+const author_controller = require('../controllers/authorController');
 
 router.get('/', author_controller.author_list);
 

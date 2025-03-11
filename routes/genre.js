@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const genre_controller = require('../../../controllers/api/genreController');
+const genre_controller = require('../controllers/genreController');
 
 router.get("/", genre_controller.genre_list);
 
