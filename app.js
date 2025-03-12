@@ -5,7 +5,6 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
 require('dotenv').config();
-const cors = require('cors');
 
 const indexRouter = require('./routes/index');
 const bookRouter = require('./routes/book');
@@ -27,7 +26,6 @@ async function main() {
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-app.use(cors({ origin: 'http://localhost:3000' }))
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

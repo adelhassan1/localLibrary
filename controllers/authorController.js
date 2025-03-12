@@ -31,7 +31,7 @@ exports.author_detail = asyncHandler(async (req, res, next) => {
 	});
 });
 
-//Display Author create form on post.
+//Display Author create form.
 exports.author_create = [
 	checkSchema({
 		first_name: {
