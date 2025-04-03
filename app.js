@@ -10,6 +10,7 @@ const indexRouter = require('./routes/index');
 const bookRouter = require('./routes/book');
 const authorRouter = require('./routes/author');
 const genreRouter = require('./routes/genre');
+const userRouter = require('./routes/user');
 
 
 const app = express();
@@ -37,6 +38,7 @@ app.use('/api/v1', indexRouter);
 app.use('/api/v1/authors', authorRouter);
 app.use('/api/v1/books', bookRouter);
 app.use('/api/v1/genres', genreRouter);
+app.use('/api/v1/users', userRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -51,7 +53,6 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
 });
 
 

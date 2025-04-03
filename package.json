@@ -8,6 +8,7 @@
     "serverstart": "DEBUG=locallibrary: & npm run devstart"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "debug": "^4.4.0",
@@ -18,6 +19,7 @@
     "http-errors": "~2.0.0",
     "luxon": "^3.5.0",
     "mongoose": "^8.9.2",
+    "mongoose-type-email": "^1.1.2",
     "morgan": "^1.10.0",
     "pug": "3.0.3"
   },
